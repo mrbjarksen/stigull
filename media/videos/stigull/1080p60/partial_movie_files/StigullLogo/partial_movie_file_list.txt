@@ -1,0 +1,4 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/bjarkibharksen/manimce/stigull/media/videos/stigull/1080p60/partial_movie_files/StigullLogo/450974505_497355897_854174434.mp4'
+file 'file:/Users/bjarkibharksen/manimce/stigull/media/videos/stigull/1080p60/partial_movie_files/StigullLogo/3968072068_1333714029_503946085.mp4'
+file 'file:/Users/bjarkibharksen/manimce/stigull/media/videos/stigull/1080p60/partial_movie_files/StigullLogo/3968072068_1415574386_3733928390.mp4'
