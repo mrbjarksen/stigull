@@ -1,9 +1,26 @@
+### NOTE: Due to font weirdness, the scenes in this file
+###       only produce the correct logo when rendered on macos.
+###       On other operating systems, the contour integral sign
+###       is not the same (it is rendered using Pango, not TeX).
+###       My working theory is that most fonts do not define
+###       the unicode character "∮" (U+222E), and so the operating
+###       system defaults to some fallback font.
+###       I'm not sure what this fallback font is in macos.
+###       My research suggests it should be Helvetica Neue
+###       but other sources suggest otherwise (namely 
+###       https://codepen.io/MJLueck/pen/BQBREQ).
+###       I have been unable to work around this issue with
+###       .svg and .png files, so for now it is best to
+###       render these scenes in macos.
+
 from manim import *
 
 config.background_color = "#252525"
-# config.background_opacity = 0
+config.background_opacity = 0
 config.pixel_width = 1920
 config.pixel_height = 1180
+config.format = "webm"
+config.movie_file_extension = ".webm"
 
 sc = 0.05
 xmin = 0.18 - sc
