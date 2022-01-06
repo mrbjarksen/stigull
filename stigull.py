@@ -1,6 +1,7 @@
 from manim import *
 
 config.background_color = "#252525"
+# config.background_opacity = 0
 config.pixel_width = 1920
 config.pixel_height = 1180
 
@@ -85,11 +86,20 @@ class StigullLogo(Scene):
         for t in tri.get_groups():
             self.add(t)
             triparts.add(t)
-            t.add_updater(
-                lambda t: t.set_opacity(
-                    1 + np.cross(urcorner - dcorner, t.get_bottom() - dcorner)[2] / (np.linalg.norm(urcorner - dcorner) * uldist)
-                )
-            )
+            def color_updater(tr):
+                alpha = 1 + np.cross(urcorner - dcorner, tr.get_bottom() - dcorner)[2] / (np.linalg.norm(urcorner - dcorner) * uldist)
+                if alpha > 1:
+                    alpha = 1
+                if alpha < 0:
+                    alpha = 0
+                rgb = hex(round(25 * (1 - alpha) + 255 * alpha))[2:]
+                tr.set_color("#" + rgb*3)
+            t.add_updater(color_updater)
+            # t.add_updater(
+            #     lambda t: t.set_opacity(
+            #         1 + np.cross(urcorner - dcorner, t.get_bottom() - dcorner)[2] / (np.linalg.norm(urcorner - dcorner) * uldist)
+            #     )
+            # )
 
         tri = triparts
 
