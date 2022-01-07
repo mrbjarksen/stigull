@@ -15,12 +15,30 @@
 
 from manim import *
 
+## For StigullLogoRec
+# config.background_color = "#252525"
+# config.pixel_width = 1920
+# config.pixel_height = 1180
+# config.format = "webm"
+# config.movie_file_extension = '.' + config.format
+
+## For StigullLogoPlain
+# config.background_opacity = 0
+# config.pixel_width = 512
+# config.pixel_height = 512
+# config.frame_height = 1
+# config.frame_width = 1
+# config.format = "png"
+
+## For StigullProfilePlaceholder
 config.background_color = "#252525"
-config.background_opacity = 0
-config.pixel_width = 1920
-config.pixel_height = 1180
-config.format = "webm"
-config.movie_file_extension = ".webm"
+config.pixel_width = 512
+config.pixel_height = 512
+config.frame_height = 1
+config.frame_width = 1
+config.format = "png"
+
+####################################
 
 sc = 0.05
 xmin = 0.18 - sc
@@ -36,7 +54,7 @@ textprop = (0.125 + 0.114) / Dy
 
 class SierpinskiTriangle(VGroup):
     def __init__(self, depth, root_depth=0, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.depth = depth
         if depth == 0:
             root = Triangle(
@@ -73,67 +91,14 @@ class SierpinskiTriangle(VGroup):
                 )
             last += 2*k
             k *= 3
-
-
-class StigullLogo(Scene):
-    def construct(self):
-        n = 4
-        tri = SierpinskiTriangle(n).scale(3)
-        # tri.move_to(config.bottom, aligned_edge=DOWN).shift(tri.height*UP)
-
-        S = Text("\u222E", font="Arial")
-        S.scale_to_fit_height(textprop * tri.height)
-        S.move_to((ytext - ymin)/Dy*tri.get_top() + (ymax - ytext)/Dy*tri.get_bottom())
-        S.rotate((20*(1+sc))*DEGREES)
-
-        text = Tex("STIGULL")
-        text.scale_to_fit_width(tri.width)
-        text.next_to(tri, UP)
-
-        VGroup(tri, S, text).move_to(ORIGIN)
-
-        ulcorner, urcorner, dcorner = tri.get_corner(UL), tri.get_corner(UR), tri.get_bottom()
-        uldist = np.cross(urcorner - dcorner, ulcorner - dcorner)[2] / np.linalg.norm(urcorner - dcorner)
-        tri.scale(2**n, about_point=ulcorner)
-
-        self.remove(tri)
-
-        triparts = VGroup()
-
-        for t in tri.get_groups():
-            self.add(t)
-            triparts.add(t)
-            def color_updater(tr):
-                alpha = 1 + np.cross(urcorner - dcorner, tr.get_bottom() - dcorner)[2] / (np.linalg.norm(urcorner - dcorner) * uldist)
-                if alpha > 1:
-                    alpha = 1
-                if alpha < 0:
-                    alpha = 0
-                rgb = hex(round(25 * (1 - alpha) + 255 * alpha))[2:]
-                tr.set_color("#" + rgb*3)
-            t.add_updater(color_updater)
-            # t.add_updater(
-            #     lambda t: t.set_opacity(
-            #         1 + np.cross(urcorner - dcorner, t.get_bottom() - dcorner)[2] / (np.linalg.norm(urcorner - dcorner) * uldist)
-            #     )
-            # )
-
-        tri = triparts
-
-        self.play(ApplyMethod(tri.scale, 1/2**n, {"about_point": ulcorner}), run_time=3)
-        self.play(Write(S), Write(text))
-        # for i, tr in enumerate(tri.get_groups()):
-        #     for t in tr: 
-        #         self.add(Tex(str(i), color=RED).move_to(t).scale(0.3))
-        self.wait()
-
+            
 
 class StigullLogoRec(Scene):
     def construct(self):
         n, r = 4, 4
         tri = SierpinskiTriangle(n+r, root_depth=r).scale(3)
-        # tri.move_to(config.bottom, aligned_edge=DOWN).shift(tri.height*UP)
-
+        base = tri.copy().set_color(config.background_color)
+        
         S = Text("\u222E", font="Arial")
         S.scale_to_fit_height(textprop * tri.height)
         S.move_to((ytext - ymin)/Dy*tri.get_top() + (ymax - ytext)/Dy*tri.get_bottom())
@@ -143,11 +108,12 @@ class StigullLogoRec(Scene):
         text.scale_to_fit_width(tri.width)
         text.next_to(tri, UP)
 
-        VGroup(tri, S, text).move_to(ORIGIN)
+        VGroup(base, tri, S, text).move_to(ORIGIN)
 
         ulcorner, urcorner, dcorner = tri.get_corner(UL), tri.get_corner(UR), tri.get_bottom()
         uldist = np.cross(urcorner - dcorner, ulcorner - dcorner)[2] / np.linalg.norm(urcorner - dcorner)
         tri.scale(2**n, about_point=ulcorner)
+        base.scale(2**n, about_point=ulcorner)
 
         self.remove(tri)
         triparts = VGroup()
@@ -164,7 +130,7 @@ class StigullLogoRec(Scene):
         tri = triparts
 
         S0, text0 = S.copy(), text.copy()
-        self.play(*[ApplyMethod(x.scale, 1/2**n, {"about_point": ulcorner}) for x in (tri, S0, text0)], run_time=3)
+        self.play(*[ApplyMethod(x.scale, 1/2**n, {"about_point": ulcorner}) for x in (base, tri, S0, text0)], run_time=3)
         newtri = SierpinskiTriangle(n).scale(3).move_to(tri)
         self.play(Write(S), Write(text), FadeIn(newtri), FadeOut(text0))
         self.wait()
@@ -223,3 +189,23 @@ class StigullLoop(Scene):
             rate_func=lambda t: 2 - 1/2**(t-1),
             run_time=3
         )
+
+
+# Compile with: -s -r 512,512
+class StigullLogoPlain(Scene):
+    def construct(self):
+        tri = SierpinskiTriangle(4)
+        S = Text("\u222E", font="Arial")
+        S.scale_to_fit_height(textprop * tri.height)
+        S.move_to((ytext - ymin)/Dy*tri.get_top() + (ymax - ytext)/Dy*tri.get_bottom())
+        S.rotate((20*(1+sc))*DEGREES)
+        VGroup(tri, S).scale_to_fit_height(config.frame_height*0.95).move_to(ORIGIN)
+        self.add(tri, S)
+
+
+class StigullProfilePlaceholder(Scene):
+    def construct(self):
+        S = Text("\u222E", font="Arial")
+        S.rotate((20*(1+sc))*DEGREES)
+        S.scale_to_fit_height(config.frame_height*0.8).move_to(ORIGIN)
+        self.add(S)
