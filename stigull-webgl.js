@@ -52,13 +52,15 @@ const scene = {
     },
     resizeCanvas: () => {
         const canvas = scene.canvas;
-        const displayWidth  = canvas.clientWidth;
-        const displayHeight = canvas.clientHeight;
+
+        const dpr = window.devicePixelRatio || 1;
+        const displayWidth = Math.floor(canvas.clientWidth * dpr);
+        const displayHeight = Math.floor(canvas.clientHeight * dpr);
 
         const needResize = canvas.width !== displayWidth || canvas.height !== displayHeight;
 
         if (needResize) {
-            canvas.width  = displayWidth;
+            canvas.width = displayWidth;
             canvas.height = displayHeight;
             scene.gl.viewport(0, 0, canvas.width, canvas.height);
             uniforms.set("aspectRatio", canvas.width/canvas.height)
@@ -73,7 +75,7 @@ const scene = {
         scene.animationQueue = [];
         scene.animationQueue.push(new Animation({
             to: {width: 2**scene.maxN},
-            duration: 5,
+            duration: 3,
         }));
         scene.animationQueue.push(new Animation({
             to: {overlayOpacity: 1},
@@ -227,13 +229,6 @@ const shapeMatrix = () => {
 const setupWebGL = () => {
     const canvas = document.getElementById("gl-canvas");
 
-    // const devicePixelRatio = window.devicePixelRatio || 1;
-    // const cssw = canvas.width, cssh = canvas.height;
-    // canvas.width  = Math.floor(cssw * devicePixelRatio);
-    // canvas.height = Math.floor(cssh * devicePixelRatio);
-    // canvas.style.width  = cssw + "px";
-    // canvas.style.height = cssh + "px";
-
     const gl = canvas.getContext("webgl");
 
     const vshader = gl.createShader(gl.VERTEX_SHADER);
@@ -257,7 +252,7 @@ const setupWebGL = () => {
 
     gl.useProgram(program);
 
-    gl.clearColor(25/255, 25/255, 25/255, 1);
+    gl.clearColor(0, 0, 0, 0);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
