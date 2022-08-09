@@ -4,16 +4,52 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 
     <style>
-      html, body {
-        background-color: #252525;
+      @font-face {
+        font-family: "Latin Modern";
+        src: url("/usr/share/fonts/OTF/lmroman10-regular.otf");
+      }
+
+      .container {
+        position: relative;
+        width: 100%;
         height: 100%;
-        margin: 0;
+        overflow: none;
+        background-color: #252525;
       }
 
       #gl-canvas {
         width: 100%;
         height: 100%;
       }
+
+      #text-container {
+        position: absolute;
+        top: 0%;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        overflow: hidden;
+        color: white;
+      }
+
+      .floating-text {
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      /*
+      #stigull-text {
+        font-family: "Latin Modern";
+        width: 100px;
+        font-size: 100%;
+      }
+
+      #stigull-oint {
+        transform: rotate(-21deg);
+      }
+    */
     </style>
 
     <script id="vertex-shader" type="x-shader/x-vertex">
@@ -55,7 +91,17 @@
   </head>
 
   <body>
-    <canvas id="gl-canvas"> </canvas>
+    <div class="container">
+      <canvas id="gl-canvas"></canvas>
+      <div id="text-container">
+        <div id="stigull-text", class="floating-text">
+          <svg id="stigull-text", width="100%", height="100%", viewBox="0 0 500 20", preserveAspectRatio="xMinYMid">
+            <text x="300", y="20", font-size="10", fill="white", style="width: 100%">STIGULL</text>
+          </svg>
+        </div>
+        <!-- <svg class="floating-text", id="stigull-oint"><text>&#x222E</text></svg> -->
+      </div>
+    </div>
   </body>
 </html>
 

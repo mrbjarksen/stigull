@@ -48,25 +48,26 @@ const scene = {
 
         scene.overlay = {count: overTri.length, offset: 2*offset}
 
+        scene.text = document.getElementById("stigull-text");
+        scene.oint = document.getElementById("stigull-oint");
+
         scene.ready();
     },
     resizeCanvas: () => {
         const canvas = scene.canvas;
+        const displayWidth = canvas.clientWidth;
+        const displayHeight = canvas.clientHeight
 
-        const dpr = window.devicePixelRatio || 1;
-        const displayWidth = Math.floor(canvas.clientWidth * dpr);
-        const displayHeight = Math.floor(canvas.clientHeight * dpr);
+        // const dpr = window.devicePixelRatio || 1;
+        // const displayWidth = Math.floor(canvas.clientWidth * dpr);
+        // const displayHeight = Math.floor(canvas.clientHeight * dpr);
 
-        const needResize = canvas.width !== displayWidth || canvas.height !== displayHeight;
-
-        if (needResize) {
+        if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
             canvas.width = displayWidth;
             canvas.height = displayHeight;
             scene.gl.viewport(0, 0, canvas.width, canvas.height);
             uniforms.set("aspectRatio", canvas.width/canvas.height)
         }
-
-        return needResize;
     },
     ready: () => {
         uniforms.set("width", 2**scene.baseN);
@@ -87,13 +88,18 @@ const scene = {
     render: () => {
         scene.resizeCanvas();
         scene.gl.clear(scene.gl.COLOR_BUFFER_BIT);
-        uniforms.set("isOverlay", 0);
-        for (tier of scene.tiers) {
-            uniforms.set("tierWidth", tier.width);
-            scene.gl.drawElements(scene.gl.TRIANGLES, tier.count, scene.gl.UNSIGNED_SHORT, tier.offset);
+        if (uniforms.overlayOpacity.value < 1) {
+            uniforms.set("isOverlay", 0);
+            for (tier of scene.tiers) {
+                if (tier.width >= 2*uniforms.width.value) break;
+                uniforms.set("tierWidth", tier.width);
+                scene.gl.drawElements(scene.gl.TRIANGLES, tier.count, scene.gl.UNSIGNED_SHORT, tier.offset);
+            }
         }
         uniforms.set("isOverlay", 1);
         scene.gl.drawElements(scene.gl.TRIANGLES, scene.overlay.count, scene.gl.UNSIGNED_SHORT, scene.overlay.offset);
+
+        // scene.text.style.width = 
     },
     animationQueue: [],
     advanceAnimationQueue: (dt) => {
@@ -217,10 +223,9 @@ const shapeMatrix = () => {
           xmax = 1 - 0.18 + sc;
           ymin = 0.1, 
           ymax = 0.7928 + 2.46*sc;
-    // We want to move (0, 1) to (1/2, -Δy/Δx) but leave (1, 0) unchanged
     return new Float32Array([
-        1, 0, // x
-        1/2, -(ymax-ymin)/(xmax-xmin), // y
+        1, 0,
+        1/2, -(ymax-ymin)/(xmax-xmin),
     ]);
 };
 
